@@ -10,6 +10,51 @@ from pathlib import Path
 import data_setup
 import engine
 
+
+def plot_loss_curves(results):
+    """Plots training curves of a results dictionary.
+
+    Args:
+        results (dict): dictionary containing list of values, e.g.
+            {"train_loss": [...],
+             "train_acc": [...],
+             "test_loss": [...],
+             "test_acc": [...]}
+    """
+
+    # Get the loss values of the results dictionary (training and test)
+    loss = results['train_loss']
+    test_loss = results['test_loss']
+
+    # Get the accuracy values of the results dictionary (training and test)
+    accuracy = results['train_acc']
+    test_accuracy = results['test_acc']
+
+    # Figure out how many epochs there were
+    epochs = range(len(results['train_loss']))
+
+    # Setup a plot
+    plt.figure(figsize=(15, 7))
+
+    # Plot loss
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, loss, label='train_loss')
+    plt.plot(epochs, test_loss, label='test_loss')
+    plt.title('Loss')
+    plt.xlabel('Epochs')
+    plt.legend()
+
+
+    # Plot accuracy
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, accuracy, label='train_accuracy')
+    plt.plot(epochs, test_accuracy, label='test_accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epochs')
+    plt.legend()
+    plt.show();
+
+
 def main():
     # Setup device, CUDA or CPU (I have CPU)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -27,13 +72,15 @@ def main():
     auto_transforms = weights.transforms()
 
     # Create training and testing DataLoaders as well as get a list of class names
-    train_dataloader, test_dataloader, class_names = data_setup.create_dataloaders(train_dir=train_dir,
-                                                                                   test_dir=test_dir,
+    train_dataloader, test_dataloader, class_names = data_setup.create_dataloaders(train_dir=str(train_dir),
+                                                                                   test_dir=str(test_dir),
                                                                                    transform=auto_transforms,
                                                                                    # perform same data transforms on our own data as the pretrained model
                                                                                    batch_size=32)  # set mini-batch size to 32
 
     print("class names:", class_names)
+    print("train_dataloader:", train_dataloader)
+    print("test_dataloader:", test_dataloader)
 
     # Instantiate model. We are using EfficientNet_B0 for the first run
     model = models.efficientnet_b0(weights=weights).to(device)
@@ -62,11 +109,11 @@ def main():
 
     # Define loss and optimizer
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0008)
 
     # Set the manual seeds
-    torch.manual_seed(1256)
-    torch.cuda.manual_seed(1256)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed(42)
 
     # Start the timer
     from timeit import default_timer as timer
@@ -78,12 +125,15 @@ def main():
                            test_dataloader=test_dataloader,
                            optimizer=optimizer,
                            loss_fn=loss_fn,
-                           epochs=5,
+                           epochs=10,
                            device=device)
 
     # End the timer and print out how long it took
     end_time = timer()
     print(f"[INFO] Total training time: {end_time - start_time:.3f} seconds")
+
+    plot_loss_curves(results)
+
 
 if __name__ == "__main__":
     main()
