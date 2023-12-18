@@ -2,10 +2,10 @@
 Contains functions for training and testing a PyTorch model.
 """
 import torch
+import torch.utils.data
 
 from tqdm.auto import tqdm
 from typing import Dict, List, Tuple
-
 
 def train_step(model: torch.nn.Module,
                dataloader: torch.utils.data.DataLoader,

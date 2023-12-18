@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 """Plots training curves of a results dictionary. """
 
 
-def plot_loss_curves(results):
+def plot_loss_curves(results, m=str):
     # Get the loss values of the results dictionary (training and test)
     loss = results['train_loss']
     test_loss = results['test_loss']
@@ -33,4 +33,7 @@ def plot_loss_curves(results):
     plt.title('Accuracy')
     plt.xlabel('Epochs')
     plt.legend()
+    plt.savefig("loss_curves/" + str(m) + "_curves.png")
+
+    # plt.show() last since it clears the plot
     plt.show()
