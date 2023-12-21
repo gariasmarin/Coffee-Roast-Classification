@@ -31,6 +31,11 @@ To predict images using the EfficientNet-B1 model (assuming it was trained), use
 
 A figure with an image and a probability score will appear. To continue viewing the test images, close the current figure, and the next figure will show.
 
+Here is an example of what an image classification will look like:
+
+![medium1](https://github.com/gariasmarin/Coffee-Roast-Classification/assets/58484718/d3551b23-1f83-4b9d-908c-d32da1f3a129)
+
+
 
 
 # Future work
